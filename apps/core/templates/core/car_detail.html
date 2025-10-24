@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}{{ car.brand.name }} {{ car.model }} - SellCars{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-900">
+    <!-- Back Button -->
+    <div class="container mx-auto px-4 py-4">
+        <a href="{% url 'core:car_list' %}" class="text-orange-500 hover:text-orange-400 flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Back to listings</span>
+        </a>
+    </div>
+
+    <div class="container mx-auto px-4 pb-12">
+        <!-- Car Title -->
+        <div class="mb-6">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                {{ car.brand.name }} {{ car.model }}
+            </h1>
+            <p class="text-slate-400 text-lg">{{ car.location }} • {{ car.year }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Images & Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Car Images -->
+                <div class="bg-slate-800 rounded-xl overflow-hidden">
+                    {% with main_image=car.get_main_image %}
+                    {% if main_image %}
+                    <img src="{{ main_image.image.url }}" alt="{{ car.title }}" class="w-full h-96 object-cover">
+                    {% else %}
+                    <div class="w-full h-96 flex items-center justify-center bg-slate-700">
+                        <svg class="w-32 h-32 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+
+                <!-- Car Specifications -->
+                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">Specifications</h2>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Year</div>
+                            <div class="text-white font-semibold">{{ car.year }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Mileage</div>
+                            <div class="text-white font-semibold">{{ car.mileage|floatformat:0 }} km</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Power</div>
+                            <div class="text-white font-semibold">{{ car.power_hp }} HP</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Fuel Type</div>
+                            <div class="text-white font-semibold">{{ car.get_fuel_type_display }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Transmission</div>
+                            <div class="text-white font-semibold">{{ car.get_transmission_display }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Body Type</div>
+                            <div class="text-white font-semibold">{{ car.get_body_type_display }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Color</div>
+                            <div class="text-white font-semibold">{{ car.get_color_display }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Doors</div>
+                            <div class="text-white font-semibold">{{ car.doors }}</div>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-sm mb-1">Seats</div>
+                            <div class="text-white font-semibold">{{ car.seats }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">Description</h2>
+                    <p class="text-slate-300 leading-relaxed">{{ car.description }}</p>
+                </div>
+
+                <!-- Map -->
+                {% if car.latitude and car.longitude %}
+                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">Location</h2>
+                    <p class="text-slate-400 mb-4">{{ car.location }}</p>
+                    <div id="map" style="height: 400px; border-radius: 0.5rem; overflow: hidden;"></div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Column: Price & Contact -->
+            <div class="lg:col-span-1">
+                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 sticky top-4">
+                    <!-- Price -->
+                    <div class="mb-6">
+                        {% if car.is_for_rent and car.price_per_day %}
+                        <div class="text-3xl font-bold text-white mb-2">
+                            €{{ car.price_per_day|floatformat:0 }}
+                            <span class="text-lg text-slate-400">per day</span>
+                        </div>
+                        {% if car.price_per_week %}
+                        <div class="text-slate-400">
+                            €{{ car.price_per_week|floatformat:0 }} per week
+                        </div>
+                        {% endif %}
+                        {% endif %}
+
+                        {% if car.is_for_sale %}
+                        <div class="text-3xl font-bold gradient-text">
+                            €{{ car.price|floatformat:0 }}
+                        </div>
+                        {% if car.is_for_rent %}
+                        <div class="text-slate-400 text-sm mt-1">Purchase price</div>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Listing Type -->
+                    <div class="flex gap-2 mb-6">
+                        {% if car.is_for_sale %}
+                        <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-semibold">
+                            For Sale
+                        </span>
+                        {% endif %}
+                        {% if car.is_for_rent %}
+                        <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-semibold">
+                            For Rent
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="border-t border-slate-700 pt-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Contact Seller</h3>
+
+                        <div class="mb-4">
+                            <div class="text-slate-400 text-sm mb-1">Seller</div>
+                            <div class="text-white font-semibold">{{ car.seller.username }}</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="text-slate-400 text-sm mb-1">Phone</div>
+                            <div class="text-white font-semibold">{{ car.phone }}</div>
+                        </div>
+
+                        <a href="tel:{{ car.phone }}" class="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center py-3 rounded-lg font-semibold transition">
+                            Call Seller
+                        </a>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="border-t border-slate-700 pt-6 mt-6">
+                        <div class="text-slate-400 text-sm">
+                            {{ car.views }} views
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet CSS & JS -->
+{% if car.latitude and car.longitude %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Initialize map
+    const map = L.map('map').setView([{{ car.latitude }}, {{ car.longitude }}], 13);
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add marker
+    const marker = L.marker([{{ car.latitude }}, {{ car.longitude }}]).addTo(map);
+    marker.bindPopup(`
+        <div class="p-2">
+            <h3 class="font-bold">{{ car.brand.name }} {{ car.model }}</h3>
+            <p>{{ car.location }}</p>
+            <p class="text-lg font-semibold mt-2">
+                {% if car.is_for_rent and car.price_per_day %}
+                €{{ car.price_per_day|floatformat:0 }} per day
+                {% else %}
+                €{{ car.price|floatformat:0 }}
+                {% endif %}
+            </p>
+        </div>
+    `).openPopup();
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,716 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Advertisement - SellCars{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Sidebar -->
+        <div class="lg:col-span-1">
+            {% include 'components/profile_sidebar.html' %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold gradient-text mb-2">
+                    Add New Advertisement
+                </h1>
+                <p class="text-slate-400">List your car for sale</p>
+            </div>
+
+            <!-- Form -->
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Image Upload Section -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                        </svg>
+                        Car Photos
+                    </h2>
+                    <p class="text-slate-400 text-sm mb-4">
+                        Upload up to 10 photos. First photo will be the main
+                        image.
+                    </p>
+
+                    <div
+                        class="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-orange-500 transition"
+                        id="drop-zone"
+                    >
+                        <input
+                            type="file"
+                            name="images"
+                            id="images"
+                            multiple
+                            accept="image/*"
+                            class="hidden"
+                        />
+                        <label for="images" class="cursor-pointer">
+                            <svg
+                                class="w-16 h-16 mx-auto mb-4 text-slate-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                />
+                            </svg>
+                            <p class="text-white font-semibold mb-2">
+                                Click to upload or drag and drop
+                            </p>
+                            <p class="text-slate-400 text-sm">
+                                PNG, JPG, GIF up to 10MB each
+                            </p>
+                        </label>
+                    </div>
+
+                    <!-- Image Preview Grid -->
+                    <div
+                        id="preview-grid"
+                        class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4 hidden"
+                    >
+                        <!-- Previews will be added here -->
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                        Basic Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Title *</label
+                            >
+                            {{ form.title }} {% if form.title.errors %}
+                            <p class="mt-1 text-sm text-red-400">
+                                {{ form.title.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Brand *</label
+                            >
+                            {{ form.brand }} {% if form.brand.errors %}
+                            <p class="mt-1 text-sm text-red-400">
+                                {{ form.brand.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Model *</label
+                            >
+                            {{ form.model }} {% if form.model.errors %}
+                            <p class="mt-1 text-sm text-red-400">
+                                {{ form.model.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Year *</label
+                            >
+                            {{ form.year }} {% if form.year.errors %}
+                            <p class="mt-1 text-sm text-red-400">
+                                {{ form.year.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Body Type *</label
+                            >
+                            {{ form.body_type }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Condition *</label
+                            >
+                            {{ form.condition }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Specifications -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                        </svg>
+                        Technical Specifications
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Mileage (km) *</label
+                            >
+                            {{ form.mileage }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Fuel Type *</label
+                            >
+                            {{ form.fuel_type }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Transmission *</label
+                            >
+                            {{ form.transmission }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Engine Size (cm³)</label
+                            >
+                            {{ form.engine_size }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Power (HP) *</label
+                            >
+                            {{ form.power_hp }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Power (kW)</label
+                            >
+                            {{ form.power_kw }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >CO2 Emission (g/km)</label
+                            >
+                            {{ form.co2_emission }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Consumption (l/100km)</label
+                            >
+                            {{ form.consumption }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Color *</label
+                            >
+                            {{ form.color }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Doors</label
+                            >
+                            {{ form.doors }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Seats</label
+                            >
+                            {{ form.seats }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Details -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                        </svg>
+                        Registration Details
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >First Registration</label
+                            >
+                            {{ form.first_registration }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Previous Owners</label
+                            >
+                            {{ form.previous_owners }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >VIN</label
+                            >
+                            {{ form.vin }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Emission Class</label
+                            >
+                            {{ form.emission_class }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Emission Sticker</label
+                            >
+                            {{ form.emission_sticker }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description & Features -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h7"
+                            />
+                        </svg>
+                        Description & Features
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Description *</label
+                            >
+                            {{ form.description }}
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Features</label
+                            >
+                            {{ form.features }}
+                            <p class="mt-1 text-xs text-slate-400">
+                                Separate features with commas
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price & Availability -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                        Price & Availability
+                    </h2>
+
+                    <div class="space-y-6">
+                        <!-- Availability Options -->
+                        <div class="flex gap-6">
+                            <label
+                                class="flex items-center space-x-3 cursor-pointer"
+                            >
+                                {{ form.is_for_sale }}
+                                <span class="text-slate-300 font-medium"
+                                    >For Sale</span
+                                >
+                            </label>
+                            <label
+                                class="flex items-center space-x-3 cursor-pointer"
+                            >
+                                {{ form.is_for_rent }}
+                                <span class="text-slate-300 font-medium"
+                                    >For Rent</span
+                                >
+                            </label>
+                        </div>
+
+                        <!-- Sale Price -->
+                        <div
+                            id="sale-price-section"
+                            class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                        >
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-slate-300 mb-2"
+                                    >Sale Price (€)</label
+                                >
+                                {{ form.price }}
+                                <p class="mt-1 text-xs text-slate-400">
+                                    Total price for purchase
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Rental Prices -->
+                        <div
+                            id="rental-price-section"
+                            class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden"
+                        >
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-slate-300 mb-2"
+                                    >Price per Day (€)</label
+                                >
+                                {{ form.price_per_day }}
+                                <p class="mt-1 text-xs text-slate-400">
+                                    Daily rental rate
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-slate-300 mb-2"
+                                    >Price per Week (€)</label
+                                >
+                                {{ form.price_per_week }}
+                                <p class="mt-1 text-xs text-slate-400">
+                                    Weekly rental rate
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Contact -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-6"
+                >
+                    <h2
+                        class="text-xl font-semibold text-white mb-4 flex items-center"
+                    >
+                        <svg
+                            class="w-6 h-6 mr-2 text-orange-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                        </svg>
+                        Location & Contact
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Location *</label
+                            >
+                            {{ form.location }}
+                            <p class="mt-1 text-xs text-slate-400">
+                                City and country
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Phone *</label
+                            >
+                            {{ form.phone }}
+                            <p class="mt-1 text-xs text-slate-400">
+                                Contact phone number
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Latitude</label
+                            >
+                            {{ form.latitude }}
+                            <p class="mt-1 text-xs text-slate-400">
+                                For map display (optional)
+                            </p>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-slate-300 mb-2"
+                                >Longitude</label
+                            >
+                            {{ form.longitude }}
+                            <p class="mt-1 text-xs text-slate-400">
+                                For map display (optional)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-4 p-4 bg-slate-700/50 rounded-lg border border-slate-600"
+                    >
+                        <p class="text-sm text-slate-300">
+                            <strong class="text-orange-400">Tip:</strong> Get
+                            coordinates by searching your location on
+                            <a
+                                href="https://www.openstreetmap.org/"
+                                target="_blank"
+                                class="text-orange-400 hover:text-orange-300 underline"
+                                >OpenStreetMap</a
+                            >
+                            and noting the latitude and longitude values.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div
+                    class="flex items-center justify-between pt-6 border-t border-slate-700"
+                >
+                    <a
+                        href="{% url 'core:my_advertisements' %}"
+                        class="text-slate-400 hover:text-slate-300 font-medium transition"
+                    >
+                        Cancel
+                    </a>
+                    <button
+                        type="submit"
+                        class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition btn-glow flex items-center space-x-2"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                        <span>Publish Advertisement</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Image upload preview
+    const imageInput = document.getElementById("images");
+    const previewGrid = document.getElementById("preview-grid");
+    const dropZone = document.getElementById("drop-zone");
+
+    imageInput.addEventListener("change", function (e) {
+        handleFiles(this.files);
+    });
+
+    // Drag and drop
+    dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        this.classList.add("border-orange-500");
+    });
+
+    dropZone.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        this.classList.remove("border-orange-500");
+    });
+
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        this.classList.remove("border-orange-500");
+
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        imageInput.files = files;
+        handleFiles(files);
+    });
+
+    function handleFiles(files) {
+        previewGrid.innerHTML = "";
+        previewGrid.classList.remove("hidden");
+
+        Array.from(files).forEach((file, index) => {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const div = document.createElement("div");
+                div.className = "relative group";
+                div.innerHTML = `
+                <img src="${e.target.result}" class="w-full h-32 object-cover rounded-lg border-2 border-slate-600">
+                <div class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-sm px-2 py-1 rounded text-xs text-white">
+                    ${index === 0 ? "Main" : `#${index + 1}`}
+                </div>
+            `;
+                previewGrid.appendChild(div);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Toggle price sections based on availability checkboxes
+    const isForSaleCheckbox = document.querySelector(
+        'input[name="is_for_sale"]',
+    );
+    const isForRentCheckbox = document.querySelector(
+        'input[name="is_for_rent"]',
+    );
+    const salePriceSection = document.getElementById("sale-price-section");
+    const rentalPriceSection = document.getElementById("rental-price-section");
+
+    function togglePriceSections() {
+        if (isForSaleCheckbox.checked) {
+            salePriceSection.classList.remove("hidden");
+        } else {
+            salePriceSection.classList.add("hidden");
+        }
+
+        if (isForRentCheckbox.checked) {
+            rentalPriceSection.classList.remove("hidden");
+        } else {
+            rentalPriceSection.classList.add("hidden");
+        }
+    }
+
+    // Initial state
+    togglePriceSections();
+
+    // Listen for changes
+    isForSaleCheckbox.addEventListener("change", togglePriceSections);
+    isForRentCheckbox.addEventListener("change", togglePriceSections);
+</script>
+{% endblock %}

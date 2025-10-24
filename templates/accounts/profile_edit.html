@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - SellCars{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold gradient-text mb-2">Edit Profile</h1>
+            <p class="text-slate-400">Update your account information</p>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-8">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- User Information Section -->
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-4">User Information</h2>
+
+                    <!-- Username -->
+                    <div class="mb-4">
+                        <label for="id_username" class="block text-sm font-medium text-slate-300 mb-2">
+                            Username
+                        </label>
+                        {{ user_form.username }}
+                        {% if user_form.username.errors %}
+                            {% for error in user_form.username.errors %}
+                                <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="id_email" class="block text-sm font-medium text-slate-300 mb-2">
+                            Email Address
+                        </label>
+                        {{ user_form.email }}
+                        {% if user_form.email.errors %}
+                            {% for error in user_form.email.errors %}
+                                <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr class="border-slate-700">
+
+                <!-- Profile Information Section -->
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-4">Profile Information</h2>
+
+                    <!-- Avatar -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-300 mb-2">
+                            Profile Picture
+                        </label>
+                        <div class="flex items-center space-x-6">
+                            {% if user.profile.avatar %}
+                            <img
+                                src="{{ user.profile.avatar.url }}"
+                                alt="{{ user.username }}"
+                                class="w-24 h-24 rounded-full object-cover border-2 border-slate-600"
+                            >
+                            {% else %}
+                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-3xl font-bold border-2 border-slate-600">
+                                {{ user.username|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                {{ profile_form.avatar }}
+                                <p class="mt-2 text-xs text-slate-400">
+                                    JPG, PNG or GIF. Max size 2MB.
+                                </p>
+                            </div>
+                        </div>
+                        {% if profile_form.avatar.errors %}
+                            {% for error in profile_form.avatar.errors %}
+                                <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="mb-4">
+                        <label for="id_bio" class="block text-sm font-medium text-slate-300 mb-2">
+                            Bio
+                        </label>
+                        {{ profile_form.bio }}
+                        {% if profile_form.bio.errors %}
+                            {% for error in profile_form.bio.errors %}
+                                <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        <p class="mt-2 text-xs text-slate-400">
+                            Tell others about yourself
+                        </p>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-4">
+                        <label for="id_phone" class="block text-sm font-medium text-slate-300 mb-2">
+                            Phone Number
+                        </label>
+                        {{ profile_form.phone }}
+                        {% if profile_form.phone.errors %}
+                            {% for error in profile_form.phone.errors %}
+                                <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Location -->
+                    <div class="mb-4">
+                        <label for="id_location" class="block text-sm font-medium text-slate-300 mb-2">
+                            Location
+                        </label>
+                        {{ profile_form.location }}
+                        {% if profile_form.location.errors %}
+                            {% for error in profile_form.location.errors %}
+                                <p class="mt-2 text-sm text-red-400">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-slate-700">
+                    <a
+                        href="{% url 'accounts:profile' user.username %}"
+                        class="text-slate-400 hover:text-slate-300 font-medium transition"
+                    >
+                        Cancel
+                    </a>
+                    <button
+                        type="submit"
+                        class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition btn-glow"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="mt-8 bg-red-500/10 border border-red-500 rounded-xl p-6">
+            <h3 class="text-lg font-semibold text-red-400 mb-2">Danger Zone</h3>
+            <p class="text-slate-400 text-sm mb-4">
+                Once you delete your account, there is no going back. Please be certain.
+            </p>
+            <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+                Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Style form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="file"],
+    textarea {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: rgb(51 65 85);
+        border: 1px solid rgb(71 85 105);
+        border-radius: 0.5rem;
+        color: white;
+    }
+
+    input[type="file"] {
+        padding: 0.5rem;
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: rgb(148 163 184);
+    }
+
+    input:focus,
+    textarea:focus {
+        outline: none;
+        ring: 2px;
+        ring-color: rgb(249 115 22);
+        border-color: transparent;
+    }
+</style>
+{% endblock %}
