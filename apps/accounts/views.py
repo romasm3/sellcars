@@ -58,10 +58,16 @@ def logout_view(request):
 
 
 @login_required
-def profile_view(request, username):
-    """View user profile."""
+def profile_view(request):
+    """View own profile settings page (My Profile)."""
+    return render(request, "accounts/profile.html")
+
+
+@login_required
+def public_profile_view(request, username):
+    """View public user profile."""
     user = User.objects.get(username=username)
-    return render(request, "accounts/profile.html", {"profile_user": user})
+    return render(request, "accounts/public_profile.html", {"profile_user": user})
 
 
 @login_required
@@ -77,7 +83,7 @@ def profile_edit_view(request):
             user_form.save()
             profile_form.save()
             messages.success(request, "Your profile has been updated!")
-            return redirect("accounts:profile", username=request.user.username)
+            return redirect("accounts:profile")
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)

@@ -1,10 +1,22 @@
 # apps/core/forms.py
 from django import forms
-from .models import Car, CarImage, Brand
+from .models import Car, CarImage, Brand, CarModel
 
 
 class CarForm(forms.ModelForm):
     """Form for creating/editing car advertisements"""
+
+    # Override model field to use a dropdown
+    model = forms.ModelChoiceField(
+        queryset=CarModel.objects.none(),  # Will be populated via AJAX
+        required=True,
+        widget=forms.Select(
+            attrs={
+                "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500",
+                "id": "id_model",
+            }
+        ),
+    )
 
     class Meta:
         model = Car
@@ -13,6 +25,7 @@ class CarForm(forms.ModelForm):
             "brand",
             "model",
             "year",
+            "month",
             "body_type",
             "condition",
             "mileage",
@@ -39,8 +52,7 @@ class CarForm(forms.ModelForm):
             "is_for_sale",
             "is_for_rent",
             "location",
-            "latitude",
-            "longitude",
+            "postcode",
             "phone",
         ]
         widgets = {
@@ -52,13 +64,9 @@ class CarForm(forms.ModelForm):
             ),
             "brand": forms.Select(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                }
-            ),
-            "model": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500",
-                    "placeholder": "e.g., 430i",
+                    "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500",
+                    "id": "id_brand",
+                    "onchange": "loadModels(this.value)",
                 }
             ),
             "year": forms.NumberInput(
@@ -67,6 +75,11 @@ class CarForm(forms.ModelForm):
                     "placeholder": "2020",
                     "min": "1900",
                     "max": "2025",
+                }
+            ),
+            "month": forms.Select(
+                attrs={
+                    "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                 }
             ),
             "body_type": forms.Select(
@@ -229,18 +242,10 @@ class CarForm(forms.ModelForm):
                     "placeholder": "Berlin, Germany",
                 }
             ),
-            "latitude": forms.NumberInput(
+            "postcode": forms.TextInput(
                 attrs={
                     "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500",
-                    "placeholder": "52.520008",
-                    "step": "0.000001",
-                }
-            ),
-            "longitude": forms.NumberInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500",
-                    "placeholder": "13.404954",
-                    "step": "0.000001",
+                    "placeholder": "10115",
                 }
             ),
             "phone": forms.TextInput(

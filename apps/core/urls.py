@@ -28,4 +28,10 @@ urlpatterns = [
     ),
     # User vehicles
     path("my-vehicles/", views.my_vehicles, name="my_vehicles"),
+    # API endpoints
+    path(
+        "api/models/<int:brand_id>/",
+        views.get_models_by_brand,
+        name="get_models_by_brand",
+    ),
 ]

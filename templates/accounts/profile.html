@@ -1,155 +1,608 @@
-{% extends 'base.html' %}
-
-{% block title %}{{ profile_user.username }}'s Profile - SellCars{% endblock %}
-
+{% extends "base.html" %} {% block title %}My Profile - SellCars{% endblock %}
 {% block content %}
-<div class="container mx-auto px-4 py-12">
-    <!-- Profile Header -->
-    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden mb-8">
-        <!-- Cover Image -->
-        <div class="h-48 bg-gradient-to-r from-orange-500 to-orange-600 relative">
-            <div class="absolute inset-0 bg-black opacity-20"></div>
-        </div>
-
-        <!-- Profile Info -->
-        <div class="relative px-8 pb-8">
-            <!-- Avatar -->
-            <div class="absolute -top-16 left-8">
-                {% if profile_user.profile.avatar %}
-                <img
-                    src="{{ profile_user.profile.avatar.url }}"
-                    alt="{{ profile_user.username }}"
-                    class="w-32 h-32 rounded-full border-4 border-slate-800 object-cover shadow-xl"
+<div class="min-h-screen bg-slate-900 py-8">
+    <div class="container mx-auto px-4">
+        <div class="flex gap-6">
+            <!-- Left Sidebar Navigation -->
+            <aside class="w-80 flex-shrink-0">
+                <!-- User Info Card -->
+                <div
+                    class="bg-slate-800 rounded-xl p-6 mb-6 border border-slate-700"
                 >
-                {% else %}
-                <div class="w-32 h-32 rounded-full border-4 border-slate-800 bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-5xl font-bold shadow-xl">
-                    {{ profile_user.username|first|upper }}
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- User Info -->
-            <div class="pt-20 flex justify-between items-start">
-                <div>
-                    <h1 class="text-3xl font-bold text-white mb-2">{{ profile_user.username }}</h1>
-                    <p class="text-slate-400 mb-4">
-                        {% if profile_user.profile.bio %}
-                            {{ profile_user.profile.bio }}
-                        {% else %}
-                            No bio yet
-                        {% endif %}
-                    </p>
-                    <div class="flex items-center space-x-6 text-sm">
-                        <div class="flex items-center text-slate-400">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            {{ profile_user.email }}
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                        >
+                            {{ user.username|slice:":1"|upper }}
                         </div>
-                        <div class="flex items-center text-slate-400">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            Joined {{ profile_user.date_joined|date:"M Y" }}
+                        <div>
+                            <h3 class="text-white font-semibold text-lg">
+                                {{ user.username }}
+                            </h3>
+                            <a
+                                href="#"
+                                class="text-orange-500 text-sm hover:text-orange-400"
+                                >Edit</a
+                            >
                         </div>
                     </div>
                 </div>
 
-                <!-- Edit Profile Button (only for own profile) -->
-                {% if user == profile_user %}
-                <a
-                    href="{% url 'accounts:profile_edit' %}"
-                    class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold transition btn-glow"
+                <!-- Navigation Menu -->
+                <nav
+                    class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden"
                 >
-                    Edit Profile
-                </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 text-center">
-            <div class="text-4xl font-bold gradient-text mb-2">0</div>
-            <div class="text-slate-400 text-sm">Active Listings</div>
-        </div>
-        <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 text-center">
-            <div class="text-4xl font-bold gradient-text mb-2">0</div>
-            <div class="text-slate-400 text-sm">Cars Sold</div>
-        </div>
-        <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 text-center">
-            <div class="text-4xl font-bold gradient-text mb-2">0</div>
-            <div class="text-slate-400 text-sm">Reviews</div>
-        </div>
-    </div>
-
-    <!-- Tabs -->
-    <div x-data="{ tab: 'listings' }" class="mb-8">
-        <!-- Tab Navigation -->
-        <div class="flex space-x-4 border-b border-slate-700 mb-6">
-            <button
-                @click="tab = 'listings'"
-                :class="tab === 'listings' ? 'border-orange-500 text-orange-500' : 'border-transparent text-slate-400 hover:text-slate-300'"
-                class="px-4 py-3 border-b-2 font-medium transition"
-            >
-                Listings
-            </button>
-            <button
-                @click="tab = 'sold'"
-                :class="tab === 'sold' ? 'border-orange-500 text-orange-500' : 'border-transparent text-slate-400 hover:text-slate-300'"
-                class="px-4 py-3 border-b-2 font-medium transition"
-            >
-                Sold
-            </button>
-            <button
-                @click="tab = 'reviews'"
-                :class="tab === 'reviews' ? 'border-orange-500 text-orange-500' : 'border-transparent text-slate-400 hover:text-slate-300'"
-                class="px-4 py-3 border-b-2 font-medium transition"
-            >
-                Reviews
-            </button>
-        </div>
-
-        <!-- Tab Content -->
-        <div>
-            <!-- Listings Tab -->
-            <div x-show="tab === 'listings'" class="space-y-4">
-                <div class="bg-slate-800 rounded-xl border border-slate-700 p-12 text-center">
-                    <svg class="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold text-slate-300 mb-2">No Active Listings</h3>
-                    <p class="text-slate-400 mb-4">Start selling your car today!</p>
-                    {% if user == profile_user %}
-                    <a href="#" class="inline-block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold transition btn-glow">
-                        List a Car
+                    <!-- Overview -->
+                    <a
+                        href="{% url 'accounts:profile' %}"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                            />
+                        </svg>
+                        <span>Overview</span>
                     </a>
-                    {% endif %}
-                </div>
-            </div>
 
-            <!-- Sold Tab -->
-            <div x-show="tab === 'sold'" class="space-y-4">
-                <div class="bg-slate-800 rounded-xl border border-slate-700 p-12 text-center">
-                    <svg class="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold text-slate-300 mb-2">No Sold Cars</h3>
-                    <p class="text-slate-400">Cars sold will appear here</p>
-                </div>
-            </div>
+                    <!-- Messages -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                            />
+                        </svg>
+                        <span>Messages</span>
+                    </a>
 
-            <!-- Reviews Tab -->
-            <div x-show="tab === 'reviews'" class="space-y-4">
-                <div class="bg-slate-800 rounded-xl border border-slate-700 p-12 text-center">
-                    <svg class="w-16 h-16 mx-auto mb-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                    </svg>
-                    <h3 class="text-xl font-semibold text-slate-300 mb-2">No Reviews Yet</h3>
-                    <p class="text-slate-400">Reviews from buyers will appear here</p>
+                    <!-- Buy Section Header -->
+                    <div
+                        class="px-6 py-3 bg-slate-900 border-b border-slate-700"
+                    >
+                        <span
+                            class="text-xs font-semibold text-slate-500 uppercase"
+                            >Buy</span
+                        >
+                    </div>
+
+                    <!-- My Searches -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                            />
+                        </svg>
+                        <span>My Searches</span>
+                    </a>
+
+                    <!-- Car park / Favorites -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            />
+                        </svg>
+                        <span>Car park</span>
+                        <span class="ml-auto text-xs text-slate-500">(0)</span>
+                    </a>
+
+                    <!-- Orders -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                            />
+                        </svg>
+                        <span>Orders</span>
+                    </a>
+
+                    <!-- Financing -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                        <span>Financing</span>
+                    </a>
+
+                    <!-- Sell Section Header -->
+                    <div
+                        class="px-6 py-3 bg-slate-900 border-b border-slate-700"
+                    >
+                        <span
+                            class="text-xs font-semibold text-slate-500 uppercase"
+                            >Sell</span
+                        >
+                    </div>
+
+                    <!-- Ads / My Listings -->
+                    <a
+                        href="{% url 'core:my_advertisements' %}"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            />
+                        </svg>
+                        <span>Ads</span>
+                        <span class="ml-auto text-xs text-slate-500"
+                            >({{ user.advertisements.count }})</span
+                        >
+                    </a>
+
+                    <!-- Direct Sale -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                        </svg>
+                        <span>Direct Sale</span>
+                    </a>
+
+                    <!-- My Profile Section Header -->
+                    <div
+                        class="px-6 py-3 bg-slate-900 border-b border-slate-700"
+                    >
+                        <span
+                            class="text-xs font-semibold text-slate-500 uppercase"
+                            >My Profile</span
+                        >
+                    </div>
+
+                    <!-- My vehicles -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                            />
+                        </svg>
+                        <span>My vehicles</span>
+                    </a>
+
+                    <!-- Settings -->
+                    <a
+                        href="{% url 'accounts:profile' %}"
+                        class="flex items-center gap-3 px-6 py-4 bg-slate-700 text-white transition border-b border-slate-700"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+
+                    <!-- Communication -->
+                    <a
+                        href="#"
+                        class="flex items-center gap-3 px-6 py-4 text-slate-300 hover:bg-slate-700 hover:text-white transition"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                            />
+                        </svg>
+                        <span>Communication</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Right Content Area -->
+            <main class="flex-1">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-4xl font-bold text-white mb-2">
+                        Your account settings
+                    </h1>
+                    <p class="text-slate-400">
+                        Your customer number is:
+                        <span class="text-slate-300">{{ user.id }}</span>
+                    </p>
                 </div>
-            </div>
+
+                <!-- Profile Section -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-8 mb-6"
+                >
+                    <h2 class="text-2xl font-bold text-white mb-6">Profile</h2>
+
+                    <!-- Profile Picture -->
+                    <div
+                        class="flex items-center justify-between p-6 bg-slate-900 rounded-lg mb-4"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                            >
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <h3 class="text-white font-semibold">
+                                    Profile picture
+                                </h3>
+                                <p class="text-sm text-slate-400">
+                                    (Only visible for you)
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                        >
+                            Change
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Login Data Section -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-8 mb-6"
+                >
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        Login data
+                    </h2>
+
+                    <!-- Email -->
+                    <div class="mb-6">
+                        <h3 class="text-white font-semibold mb-2">
+                            E-mail Address
+                        </h3>
+                        <div
+                            class="flex items-center justify-between p-6 bg-slate-900 rounded-lg"
+                        >
+                            <div class="flex items-center gap-3">
+                                <span class="text-white">{{ user.email }}</span>
+                                <span
+                                    class="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded"
+                                    >Confirmed</span
+                                >
+                            </div>
+                            <button
+                                class="px-6 py-2 bg-slate-700 text-slate-400 rounded-lg cursor-not-allowed"
+                                disabled
+                            >
+                                Change
+                            </button>
+                        </div>
+                        <p
+                            class="mt-2 text-sm text-slate-400 flex items-center gap-2"
+                        >
+                            <svg
+                                class="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+                            Unfortunately, it is not possible to change the
+                            e-mail address with an active advertisement.
+                        </p>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <h3 class="text-white font-semibold mb-2">Password</h3>
+                        <div
+                            class="flex items-center justify-between p-6 bg-slate-900 rounded-lg"
+                        >
+                            <span class="text-white">••••••••••••</span>
+                            <button
+                                class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                            >
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Data Section -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-8"
+                >
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        Contact data
+                    </h2>
+
+                    <!-- Name -->
+                    <div class="mb-6">
+                        <h3 class="text-white font-semibold mb-2">Name</h3>
+                        <div
+                            class="flex items-center justify-between p-6 bg-slate-900 rounded-lg"
+                        >
+                            <span class="text-white"
+                                >{{ user.get_full_name|default:user.username
+                                }}</span
+                            >
+                            <button
+                                class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                            >
+                                Change
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-6">
+                        <h3 class="text-white font-semibold mb-2">Address</h3>
+                        <div
+                            class="flex items-center justify-between p-6 bg-slate-900 rounded-lg"
+                        >
+                            <div>
+                                <p class="text-white">Not set</p>
+                            </div>
+                            <button
+                                class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                            >
+                                Change
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <h3 class="text-white font-semibold mb-2">
+                            Phone number
+                        </h3>
+                        <div
+                            class="flex items-center justify-between p-6 bg-slate-900 rounded-lg"
+                        >
+                            <div class="flex items-center gap-3">
+                                <span class="text-white">Not set</span>
+                            </div>
+                            <button
+                                class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                            >
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-8 mb-6"
+                >
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        Documents
+                    </h2>
+
+                    <!-- My invoices -->
+                    <div>
+                        <h3 class="text-white font-semibold mb-2">
+                            My invoices
+                        </h3>
+                        <div
+                            class="flex items-center justify-between p-6 bg-slate-900 rounded-lg"
+                        >
+                            <p class="text-slate-300">
+                                Here you will find an overview of your booked
+                                packages and options
+                            </p>
+                            <button
+                                class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                            >
+                                Show
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Account Section -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 p-8"
+                >
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        Delete account
+                    </h2>
+
+                    <div class="p-6 bg-slate-900 rounded-lg mb-6">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0"
+                            >
+                                <svg
+                                    class="w-6 h-6 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-white font-semibold mb-1">
+                                    {{ user.email }}
+                                </h3>
+                                <p class="text-sm text-slate-400">
+                                    Private account, registered since {{
+                                    user.date_joined|date:"Y" }}
+                                </p>
+                            </div>
+                            <button
+                                class="px-6 py-2 bg-slate-700 text-slate-400 rounded-lg cursor-not-allowed"
+                                disabled
+                            >
+                                Delete account
+                            </button>
+                        </div>
+                        <div
+                            class="mt-4 flex items-start gap-2 text-sm text-slate-400"
+                        >
+                            <svg
+                                class="w-4 h-4 mt-0.5 flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+                            <p>
+                                Unfortunately, it is not possible to delete your
+                                user account when you have an active ad. Please
+                                delete your ad first.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Form -->
+                    <div class="p-6 bg-slate-900 rounded-lg">
+                        <h3 class="text-white font-semibold mb-4">
+                            Thank you for your feedback! What else should we
+                            improve?
+                        </h3>
+                        <textarea
+                            class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4"
+                            rows="4"
+                            placeholder="Enter here ..."
+                        ></textarea>
+                        <div class="flex justify-end gap-3">
+                            <button
+                                class="px-6 py-2 bg-transparent border-2 border-purple-500 text-purple-400 rounded-lg hover:bg-purple-500 hover:text-white transition"
+                            >
+                                Skip
+                            </button>
+                            <button
+                                class="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-semibold transition"
+                            >
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 </div>

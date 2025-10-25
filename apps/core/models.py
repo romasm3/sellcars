@@ -25,6 +25,26 @@ class Brand(models.Model):
         super().save(*args, **kwargs)
 
 
+class CarModel(models.Model):
+    """Car model for a specific brand"""
+
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="models")
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(blank=True)
+
+    class Meta:
+        ordering = ["name"]
+        unique_together = ["brand", "name"]
+
+    def __str__(self):
+        return f"{self.brand.name} {self.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class Car(models.Model):
     """Car listing/Advertisement"""
 
@@ -76,12 +96,28 @@ class Car(models.Model):
         ("gold", "Gold"),
     ]
 
+    MONTH_CHOICES = [
+        (1, "Januar"),
+        (2, "Februar"),
+        (3, "März"),
+        (4, "April"),
+        (5, "Mai"),
+        (6, "Juni"),
+        (7, "Juli"),
+        (8, "August"),
+        (9, "September"),
+        (10, "Oktober"),
+        (11, "November"),
+        (12, "Dezember"),
+    ]
+
     # Basic info
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="cars")
-    model = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)  # Keep as CharField for now
     year = models.IntegerField()
+    month = models.IntegerField(choices=MONTH_CHOICES, null=True, blank=True)
 
     # Technical details
     mileage = models.IntegerField(help_text="Kilometerstand")
@@ -158,20 +194,7 @@ class Car(models.Model):
         default=False, help_text="Car is available for rent"
     )
     location = models.CharField(max_length=100)
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True,
-        help_text="Latitude coordinate",
-    )
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True,
-        help_text="Longitude coordinate",
-    )
+    postcode = models.CharField(max_length=20, blank=True, help_text="Postal code")
 
     # Seller info
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="cars")

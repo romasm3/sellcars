@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Brand, Car, CarImage
+from .models import Brand, CarModel, Car, CarImage
 
 
 class CarImageInline(admin.TabularInline):
@@ -13,6 +13,14 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ("name", "slug")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
+
+
+@admin.register(CarModel)
+class CarModelAdmin(admin.ModelAdmin):
+    list_display = ("name", "brand", "slug")
+    list_filter = ("brand",)
+    search_fields = ("name", "brand__name")
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(Car)
