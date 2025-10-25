@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en" class="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes"
+        />
+        <title>
+            {% block title %}SellCars - Buy & Sell Cars Online{% endblock %}
+        </title>
+
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Alpine.js for interactivity -->
+        <script
+            defer
+            src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+        ></script>
+
+        {% block extra_css %}{% endblock %}
+
+        <style>
+            body {
+                background-color: #0f172a;
+                color: #e2e8f0;
+            }
+
+            /* Wider containers and reduced spacing */
+            .container {
+                max-width: 95% !important;
+                width: 95% !important;
+            }
+
+            @media (min-width: 1920px) {
+                .container {
+                    max-width: 1800px !important;
+                }
+            }
+
+            /* Reduce padding globally */
+            .px-4 {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+
+            .py-8 {
+                padding-top: 1.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
+
+            .py-12 {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+
+            /* Make card grids more compact */
+            .gap-6 {
+                gap: 1rem !important;
+            }
+
+            .gap-8 {
+                gap: 1.5rem !important;
+            }
+
+            /* Smooth scrolling */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #1e293b;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #ea580c;
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #f97316;
+            }
+
+            /* Gradient text */
+            .gradient-text {
+                background: linear-gradient(to right, #ea580c, #f97316);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            /* Card hover effect */
+            .card-hover {
+                transition:
+                    transform 0.3s ease,
+                    box-shadow 0.3s ease;
+            }
+
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(234, 88, 12, 0.3);
+            }
+
+            /* Button glow effect */
+            .btn-glow {
+                box-shadow: 0 0 20px rgba(234, 88, 12, 0.4);
+            }
+
+            .btn-glow:hover {
+                box-shadow: 0 0 30px rgba(234, 88, 12, 0.6);
+            }
+        </style>
+    </head>
+    <body class="bg-slate-900 text-slate-100" style="zoom: 0.6">
+        <!-- Header/Navigation -->
+        <header
+            class="bg-slate-800/95 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-50 shadow-lg"
+        >
+            <nav class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <a
+                        href="{% url 'core:home' %}"
+                        class="flex items-center space-x-2 group"
+                    >
+                        <span class="text-3xl">🚗</span>
+                        <span
+                            class="text-2xl font-bold gradient-text group-hover:scale-105 transition"
+                            >SellCars</span
+                        >
+                    </a>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center space-x-8">
+                        <a
+                            href="{% url 'core:home' %}"
+                            class="text-slate-300 hover:text-orange-500 transition font-medium"
+                        >
+                            Home
+                        </a>
+                        <a
+                            href="#"
+                            class="text-slate-300 hover:text-orange-500 transition font-medium"
+                        >
+                            Browse Cars
+                        </a>
+                        <a
+                            href="#"
+                            class="text-slate-300 hover:text-orange-500 transition font-medium"
+                        >
+                            Sell Your Car
+                        </a>
+                        <a
+                            href="#"
+                            class="text-slate-300 hover:text-orange-500 transition font-medium"
+                        >
+                            About
+                        </a>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Add Vehicle Button -->
+                        {% if user.is_authenticated %}
+                        <a
+                            href="{% url 'core:advertisement_create' %}"
+                            class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2.5 rounded-lg font-semibold transition shadow-lg hover:shadow-red-500/50 flex items-center space-x-2"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4v16m8-8H4"
+                                />
+                            </svg>
+                            <span>Add Vehicle</span>
+                        </a>
+                        {% endif %}
+
+                        <!-- Language Switcher -->
+                        {% load i18n %}
+                        <div x-data="{ open: false }" class="relative">
+                            <button
+                                @click="open = !open"
+                                class="flex items-center space-x-1 px-3 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 transition text-slate-300"
+                            >
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                                    />
+                                </svg>
+                                <span class="text-sm font-medium">EN</span>
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </button>
+
+                            <div
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute right-0 mt-2 w-40 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2"
+                            >
+                                <form
+                                    action="{% url 'set_language' %}"
+                                    method="post"
+                                >
+                                    {% csrf_token %}
+                                    <input
+                                        name="next"
+                                        type="hidden"
+                                        value="{{ request.path }}"
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        name="language"
+                                        value="en"
+                                        class="w-full text-left px-4 py-2 hover:bg-slate-700 transition flex items-center space-x-2 {% if LANGUAGE_CODE == 'en' %}text-orange-500{% else %}text-slate-300{% endif %}"
+                                    >
+                                        <span>🇬🇧</span>
+                                        <span>English</span>
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        name="language"
+                                        value="lt"
+                                        class="w-full text-left px-4 py-2 hover:bg-slate-700 transition flex items-center space-x-2 {% if LANGUAGE_CODE == 'lt' %}text-orange-500{% else %}text-slate-300{% endif %}"
+                                    >
+                                        <span>🇱🇹</span>
+                                        <span>Lithuanian</span>
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        name="language"
+                                        value="de"
+                                        class="w-full text-left px-4 py-2 hover:bg-slate-700 transition flex items-center space-x-2 {% if LANGUAGE_CODE == 'de' %}text-orange-500{% else %}text-slate-300{% endif %}"
+                                    >
+                                        <span>🇩🇪</span>
+                                        <span>German</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Search -->
+                        <button
+                            class="hidden md:block text-slate-400 hover:text-orange-500 transition"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                />
+                            </svg>
+                        </button>
+
+                        {% if user.is_authenticated %}
+                        <!-- User Dropdown -->
+                        <div x-data="{ open: false }" class="relative">
+                            <button
+                                @click="open = !open"
+                                class="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition"
+                            >
+                                {% if user.profile.avatar %}
+                                <img
+                                    src="{{ user.profile.avatar.url }}"
+                                    alt="{{ user.username }}"
+                                    class="w-8 h-8 rounded-full object-cover"
+                                />
+                                {% else %}
+                                <div
+                                    class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold"
+                                >
+                                    {{ user.username|first|upper }}
+                                </div>
+                                {% endif %}
+                                <span class="font-medium"
+                                    >{{ user.username }}</span
+                                >
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7"
+                                    />
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute right-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2"
+                            >
+                                <a
+                                    href="{% url 'accounts:profile' %}"
+                                    class="flex items-center px-4 py-2 hover:bg-slate-700 transition"
+                                >
+                                    <svg
+                                        class="w-5 h-5 mr-3 text-orange-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                        />
+                                    </svg>
+                                    My Profile
+                                </a>
+                                <a
+                                    href="#"
+                                    class="flex items-center px-4 py-2 hover:bg-slate-700 transition"
+                                >
+                                    <svg
+                                        class="w-5 h-5 mr-3 text-orange-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        />
+                                    </svg>
+                                    My Listings
+                                </a>
+                                <a
+                                    href="#"
+                                    class="flex items-center px-4 py-2 hover:bg-slate-700 transition"
+                                >
+                                    <svg
+                                        class="w-5 h-5 mr-3 text-orange-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                        />
+                                    </svg>
+                                    Favorites
+                                </a>
+                                <hr class="my-2 border-slate-700" />
+                                <a
+                                    href="{% url 'accounts:profile_edit' %}"
+                                    class="flex items-center px-4 py-2 hover:bg-slate-700 transition"
+                                >
+                                    <svg
+                                        class="w-5 h-5 mr-3 text-orange-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                        />
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                    </svg>
+                                    Settings
+                                </a>
+                                <hr class="my-2 border-slate-700" />
+                                <a
+                                    href="{% url 'accounts:logout' %}"
+                                    class="flex items-center px-4 py-2 hover:bg-slate-700 transition text-red-400"
+                                >
+                                    <svg
+                                        class="w-5 h-5 mr-3"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                        />
+                                    </svg>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Login/Register Buttons -->
+                        <a
+                            href="{% url 'accounts:login' %}"
+                            class="text-slate-300 hover:text-orange-500 font-medium transition"
+                        >
+                            Login
+                        </a>
+                        <a
+                            href="{% url 'accounts:register' %}"
+                            class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold transition btn-glow"
+                        >
+                            Sign Up
+                        </a>
+                        {% endif %}
+
+                        <!-- Mobile Menu Button -->
+                        <button class="md:hidden text-slate-300">
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="container mx-auto px-4 mt-4">
+            {% for message in messages %}
+            <div
+                class="p-4 rounded-lg mb-3 {% if message.tags == 'error' %}bg-red-500/20 border border-red-500 text-red-300{% elif message.tags == 'success' %}bg-green-500/20 border border-green-500 text-green-300{% elif message.tags == 'warning' %}bg-yellow-500/20 border border-yellow-500 text-yellow-300{% else %}bg-orange-500/20 border border-orange-500 text-orange-300{% endif %}"
+            >
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <main>{% block content %}{% endblock %}</main>
+
+        <!-- Footer -->
+        <footer class="bg-slate-800 border-t border-slate-700 mt-20">
+            <div class="container mx-auto px-4 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- About -->
+                    <div>
+                        <h3 class="text-xl font-bold gradient-text mb-4">
+                            🚗 SellCars
+                        </h3>
+                        <p class="text-slate-400 text-sm">
+                            Your trusted platform for buying and selling cars
+                            online. Find your dream car today!
+                        </p>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">
+                            Quick Links
+                        </h4>
+                        <ul class="space-y-2 text-slate-400 text-sm">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Browse Cars</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Sell Your Car</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Pricing</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Contact</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Support -->
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Support</h4>
+                        <ul class="space-y-2 text-slate-400 text-sm">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Help Center</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >FAQ</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Terms of Service</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-orange-500 transition"
+                                    >Privacy Policy</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">
+                            Newsletter
+                        </h4>
+                        <p class="text-slate-400 text-sm mb-3">
+                            Subscribe to get updates on new listings
+                        </p>
+                        <div class="flex">
+                            <input
+                                type="email"
+                                placeholder="Your email"
+                                class="flex-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-l-lg focus:outline-none focus:border-orange-500 text-white"
+                            />
+                            <button
+                                class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-4 py-2 rounded-r-lg transition"
+                            >
+                                <svg
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- International Language Bar -->
+                <div class="border-t border-slate-700 mt-8 pt-6 pb-4">
+                    <div class="text-center text-slate-400 text-sm mb-3">
+                        <p class="font-medium mb-2">
+                            SellCars is also available internationally:
+                        </p>
+                        <div
+                            class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2"
+                        >
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >LT</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >DE</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >AE</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >ES</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >FR</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >IT</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >NL</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >PL</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >CZ</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >RO</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >RU</a
+                            >
+                            <span class="text-slate-600">|</span>
+                            <a
+                                href="#"
+                                class="hover:text-orange-500 transition font-medium"
+                                >TR</a
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="border-t border-slate-700 pt-6 text-center text-slate-400 text-sm"
+                >
+                    <p>
+                        &copy; 2025 SellCars. All rights reserved. Made with ❤️
+                        and ☕
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        {% block extra_js %}{% endblock %}
+    </body>
+</html>

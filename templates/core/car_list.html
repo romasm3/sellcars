@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Cars - SellCars{% endblock %}
+
+
+
+{% block content %}
+<!-- Header -->
+<div class="bg-slate-900 border-b border-slate-800 py-6">
+    <div class="container mx-auto px-4">
+        <h1 class="text-3xl font-bold text-white mb-2">Browse Cars</h1>
+        <p class="text-slate-400">{{ cars.count }} cars available</p>
+    </div>
+</div>
+
+<!-- Filters & Results -->
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Filters Sidebar -->
+        <div class="lg:w-80 flex-shrink-0">
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 sticky top-4">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Filters</h2>
+
+                <form method="get" class="space-y-6">
+                    <!-- Type of Listing -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                            Listing Type
+                        </label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" name="for_sale" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">For Sale</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" name="for_rent" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">For Rent</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                            Price Range
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <input
+                                    type="number"
+                                    name="min_price"
+                                    placeholder="Min"
+                                    value="{{ request.GET.min_price }}"
+                                    class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500"
+                                >
+                            </div>
+                            <div>
+                                <input
+                                    type="number"
+                                    name="max_price"
+                                    placeholder="Max"
+                                    value="{{ request.GET.max_price }}"
+                                    class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand -->
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                            Brand
+                        </label>
+                        <select
+                            name="brand"
+                            class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500"
+                        >
+                            <option value="">All Brands</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %}selected{% endif %}>
+                                {{ brand.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Fuel Type -->
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                            Fuel Type
+                        </label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="fuel_type" value="" class="text-orange-500 focus:ring-orange-500" {% if not request.GET.fuel_type %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">All Types</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="fuel_type" value="petrol" class="text-orange-500 focus:ring-orange-500" {% if request.GET.fuel_type == "petrol" %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">Petrol</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="fuel_type" value="diesel" class="text-orange-500 focus:ring-orange-500" {% if request.GET.fuel_type == "diesel" %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">Diesel</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="fuel_type" value="electric" class="text-orange-500 focus:ring-orange-500" {% if request.GET.fuel_type == "electric" %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">Electric</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="fuel_type" value="hybrid" class="text-orange-500 focus:ring-orange-500" {% if request.GET.fuel_type == "hybrid" %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">Hybrid</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Transmission -->
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                            Transmission
+                        </label>
+                        <div class="space-y-2">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="transmission" value="" class="text-orange-500 focus:ring-orange-500" {% if not request.GET.transmission %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">All Types</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="transmission" value="automatic" class="text-orange-500 focus:ring-orange-500" {% if request.GET.transmission == "automatic" %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">Automatic</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="transmission" value="manual" class="text-orange-500 focus:ring-orange-500" {% if request.GET.transmission == "manual" %}checked{% endif %}>
+                                <span class="ml-2 text-sm text-slate-700 dark:text-slate-300">Manual</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-6 space-y-3">
+                        <button
+                            type="submit"
+                            class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-lg font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition"
+                        >
+                            Apply Filters
+                        </button>
+                        <a
+                            href="{% url 'core:car_list' %}"
+                            class="block w-full text-center border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 py-3 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                        >
+                            Clear All
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Cars Grid -->
+        <div class="flex-1">
+            {% if cars %}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                {% for car in cars %}
+                <div class="group relative">
+                    <a
+                        href="{% url 'core:car_detail' car.slug %}"
+                        class="block bg-white dark:bg-slate-800 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-slate-200 dark:border-slate-700"
+                    >
+                        <!-- Car Image -->
+                        <div class="relative h-64 bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                            {% with main_image=car.get_main_image %}
+                            {% if main_image %}
+                            <img
+                                src="{{ main_image.image.url }}"
+                                alt="{{ car.title }}"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                            {% else %}
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg
+                                    class="w-20 h-20 text-slate-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    />
+                                </svg>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+
+                            <!-- Favorite Button - Airbnb Style -->
+                            <button
+                                class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-transparent hover:scale-110 transition-transform"
+                                onclick="event.preventDefault(); alert('Favorite feature coming soon!');"
+                            >
+                                <svg class="w-6 h-6 text-white drop-shadow-lg fill-transparent hover:fill-red-500 stroke-2" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                </svg>
+                            </button>
+
+                            <!-- Guest Favorite Badge -->
+                            {% if car.views > 100 %}
+                            <div class="absolute top-3 left-3 bg-white px-3 py-1 rounded-full shadow-lg">
+                                <span class="text-sm font-semibold text-slate-800">Guest favorite</span>
+                            </div>
+                            {% endif %}
+
+                            <!-- Listing Type Badge -->
+                            <div class="absolute bottom-3 left-3">
+                                {% if car.is_for_rent %}
+                                <span class="bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full">For Rent</span>
+                                {% endif %}
+                                {% if car.is_for_sale %}
+                                <span class="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full ml-1">For Sale</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Car Info -->
+                        <div class="p-4">
+                            <!-- Location & Type -->
+                            <div class="flex items-center justify-between mb-1">
+                                <h3 class="text-base font-semibold text-slate-900 dark:text-white truncate">
+                                    {{ car.brand.name }} {{ car.model }}
+                                </h3>
+                            </div>
+
+                            <!-- Details -->
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">
+                                {{ car.location }} · {{ car.year }}
+                            </p>
+
+                            <!-- Specs -->
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                                {{ car.mileage|floatformat:0 }} km · {{ car.power_hp }} HP · {{ car.get_fuel_type_display }}
+                            </p>
+
+                            <!-- Price -->
+                            <div class="flex items-baseline gap-1">
+                                {% if car.is_for_rent and car.price_per_day %}
+                                <span class="text-lg font-semibold text-slate-900 dark:text-white">€{{ car.price_per_day|floatformat:0 }}</span>
+                                <span class="text-sm text-slate-500 dark:text-slate-400">per day</span>
+                                {% elif car.is_for_sale %}
+                                <span class="text-lg font-semibold text-slate-900 dark:text-white">€{{ car.price|floatformat:0 }}</span>
+                                <span class="text-sm text-slate-500 dark:text-slate-400">total</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <svg class="w-24 h-24 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">No cars found</h3>
+                <p class="text-slate-500 dark:text-slate-400 mb-6">Try adjusting your filters to see more results</p>
+                <a
+                    href="{% url 'core:car_list' %}"
+                    class="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition"
+                >
+                    Clear Filters
+                </a>
+            </div>
+            {% endif %}
+        </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
